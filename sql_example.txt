@@ -1,0 +1,88 @@
+/* Create two tables for MPA info */
+DROP TABLE IF EXISTS site;
+DROP TABLE IF EXISTS mpas;
+
+CREATE TABLE mpas
+         (mpaid_pk integer PRIMARY KEY,
+          mpaname text,
+          sizeha integer);
+
+INSERT INTO mpas VALUES (1, 'Teluk Mayalibit MPA', 53100);
+INSERT INTO mpas VALUES (2, 'Teluk Cenderwasih Natinal Park', 1435500);
+INSERT INTO mpas VALUES (3, 'Kaimana MPA', 597747);
+
+
+CREATE TABLE site
+          (sitedid_pk integer PRIMARY KEY,
+		   sitename text,
+		   mpaid_fk integer,
+		   reeftype text,
+		   fishcount integer,   
+FOREIGN KEY (`mpaid_fk`) REFERENCES mpas (`mpaid_pk`));   
+
+INSERT INTO site VALUES (1, 'Aikor', 1, 'Patch', 5523);
+INSERT INTO site VALUES (2, 'Barrier in front of Mumes', 1, 'Barrier', 1234);
+INSERT INTO site VALUES (3, 'Mumes', 1, 'Fringing', 2429);
+INSERT INTO site VALUES (4, 'Inwor Hasab', 1, 'Barrier', 3002);
+INSERT INTO site VALUES (5, 'Laguna Walo', 2, 'Lagoon', 1239);
+INSERT INTO site VALUES (6, 'Boo Barrier Reef', 2, 'Barrier', 142);
+INSERT INTO site VALUES (7, 'Walib South', 3, 'Fringing', 10429);
+
+
+
+/* Run some basic queries */
+SELECT* FROM mpa;
+SELECT * FROM site;
+
+SELECT * FROM site
+WHERE reeftype = 'Barrier';
+
+SELECT * FROM site
+WHERE fishcount > 3000;
+
+SELECT * from site
+WHERE reeftype = 'Barrier' AND fishcount < 3000;
+
+
+/* Aggregating */
+SELECT SUM(fishcount)
+FROM site;
+
+SELECT MAX(fishcount)
+FROM site;
+
+SELECT reeftype,
+       SUM(fishcount)
+FROM site
+GROUP BY reeftype;
+
+
+
+/* Joining */
+SELECT *
+FROM mpa AS t1 JOIN site AS t2 ON
+     t1.mpaid_pk = t2.mpaid_fk;
+
+
+/* join and aggregate */
+SELECT mpaname, count(*)
+FROM mpa AS t1 JOIN site AS t2 ON
+     t1.mpaid_pk = t2.mpaid_fk
+GROUP BY mpaname;
+
+SELECT mpaname, sum(fishcount)
+FROM mpa AS t1 JOIN site AS t2 ON
+     t1.mpaid_pk = t2.mpaid_fk
+GROUP BY mpaname
+ORDER BY fishcount;
+
+
+/* calculating new columns */
+SELECT mpaname,
+       sum(fishcount) / sizeha AS fishperha
+FROM mpas AS t1 JOIN site AS t2 ON
+     t1.mpaid_pk = t2.mpaid_fk
+GROUP BY mpaname;
+
+
+
